@@ -3,7 +3,7 @@ mod days;
 use std::fs::read_to_string;
 use std::path::Path;
 
-use days::day01;
+use days::{day01, day02};
 
 fn read_lines(relative_path: &str) -> Vec<String> {
     let mut result = Vec::new();
@@ -23,6 +23,14 @@ fn day01() {
     day01::solve_part_two(read_lines("src/inputs/day01.txt"));
 }
 
+fn day02() {
+    // 2331
+    day02::solve_part_one(read_lines("src/inputs/day02.txt"));
+    // 71585
+    day02::solve_part_two(read_lines("src/inputs/day02.txt"));
+}
+
 fn main() {
-    day01()
+    day01();
+    day02();
 }
