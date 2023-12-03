@@ -35,20 +35,18 @@ pub fn solve_part_one(lines: Vec<String>) {
         let mut is_game_invalid = false;
         for game_iteration in game_scores {
             for dice in game_iteration.split(",") {
+                let dice_count = get_dice_count(dice.to_string());
                 if dice.contains("blue") {
-                    let dice_count = get_dice_count(dice.to_string());
                     if dice_count > max_blue {
                         is_game_invalid = true;
                     }
                 }
                 if dice.contains("green") {
-                    let dice_count = get_dice_count(dice.to_string());
                     if dice_count > max_green {
                         is_game_invalid = true;
                     }
                 }
                 if dice.contains("red") {
-                    let dice_count = get_dice_count(dice.to_string());
                     if dice_count > max_red {
                         is_game_invalid = true;
                     }
@@ -79,14 +77,15 @@ pub fn solve_part_two(lines: Vec<String>) {
         let mut green = 1;
         for game_iteration in game_scores {
             for dice in game_iteration.split(",") {
+                let dice_count = get_dice_count(dice.to_string());
                 if dice.contains("blue") {
-                    blue = blue.max(get_dice_count(dice.to_string()));
+                    blue = blue.max(dice_count);
                 }
                 if dice.contains("green") {
-                    green = green.max(get_dice_count(dice.to_string()));
+                    green = green.max(dice_count);
                 }
                 if dice.contains("red") {
-                    red = red.max(get_dice_count(dice.to_string()));
+                    red = red.max(dice_count);
                 }
             }
         }
