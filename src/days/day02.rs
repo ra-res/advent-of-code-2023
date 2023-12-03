@@ -1,5 +1,3 @@
-use std::cmp;
-
 fn get_dice_count(dice: String) -> i64 {
     return dice
         .split_whitespace()
@@ -36,27 +34,24 @@ pub fn solve_part_one(lines: Vec<String>) {
 
         let mut is_game_invalid = false;
         for game_iteration in game_scores {
-            for dice in game_iteration.split(",").map(str::to_string) {
-                match dice {
-                    dice if dice.contains("blue") => {
-                        let dice_count = get_dice_count(dice);
-                        if dice_count > max_blue {
-                            is_game_invalid = true;
-                        }
+            for dice in game_iteration.split(",") {
+                if dice.contains("blue") {
+                    let dice_count = get_dice_count(dice.to_string());
+                    if dice_count > max_blue {
+                        is_game_invalid = true;
                     }
-                    dice if dice.contains("green") => {
-                        let dice_count = get_dice_count(dice);
-                        if dice_count > max_green {
-                            is_game_invalid = true;
-                        }
+                }
+                if dice.contains("green") {
+                    let dice_count = get_dice_count(dice.to_string());
+                    if dice_count > max_green {
+                        is_game_invalid = true;
                     }
-                    dice if dice.contains("red") => {
-                        let dice_count = get_dice_count(dice);
-                        if dice_count > max_red {
-                            is_game_invalid = true;
-                        }
+                }
+                if dice.contains("red") {
+                    let dice_count = get_dice_count(dice.to_string());
+                    if dice_count > max_red {
+                        is_game_invalid = true;
                     }
-                    _ => {}
                 }
             }
         }
@@ -65,7 +60,7 @@ pub fn solve_part_one(lines: Vec<String>) {
             invalid_games += game_id.parse::<i64>().unwrap();
         }
     }
-    println!("{}", invalid_games)
+    println!("day2_1 {}", invalid_games)
 }
 
 pub fn solve_part_two(lines: Vec<String>) {
@@ -79,29 +74,23 @@ pub fn solve_part_two(lines: Vec<String>) {
             .map(str::to_string)
             .collect::<Vec<_>>();
 
-        let mut highest_blue = 1;
-        let mut highest_red = 1;
-        let mut highest_green = 1;
+        let mut blue = 1;
+        let mut red = 1;
+        let mut green = 1;
         for game_iteration in game_scores {
-            for dice in game_iteration.split(",").map(str::to_string) {
-                match dice {
-                    dice if dice.contains("blue") => {
-                        let dice_count = get_dice_count(dice);
-                        highest_blue = cmp::max(dice_count, highest_blue);
-                    }
-                    dice if dice.contains("green") => {
-                        let dice_count = get_dice_count(dice);
-                        highest_green = cmp::max(dice_count, highest_green);
-                    }
-                    dice if dice.contains("red") => {
-                        let dice_count = get_dice_count(dice);
-                        highest_red = cmp::max(dice_count, highest_red);
-                    }
-                    _ => {}
+            for dice in game_iteration.split(",") {
+                if dice.contains("blue") {
+                    blue = blue.max(get_dice_count(dice.to_string()));
+                }
+                if dice.contains("green") {
+                    green = green.max(get_dice_count(dice.to_string()));
+                }
+                if dice.contains("red") {
+                    red = red.max(get_dice_count(dice.to_string()));
                 }
             }
         }
-        sum_of_powers += highest_blue * highest_green * highest_red;
+        sum_of_powers += blue * green * red;
     }
-    println!("{}", sum_of_powers)
+    println!("day2_2 {}", sum_of_powers)
 }

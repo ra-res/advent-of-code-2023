@@ -32,7 +32,7 @@ pub fn solve_part_one(lines: Vec<String>) {
         let addition = format!("{}{}", first, last).parse::<i64>();
         result += addition.unwrap();
     }
-    println!("{}", result)
+    println!("day1_1 {}", result)
 }
 
 pub fn solve_part_two(lines: Vec<String>) {
@@ -45,5 +45,5 @@ pub fn solve_part_two(lines: Vec<String>) {
         let addition = format!("{}{}", first, last).parse::<i64>().unwrap();
         result += addition;
     }
-    println!("{}", result)
+    println!("day2_2 {}", result)
 }
