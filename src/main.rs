@@ -45,10 +45,10 @@ fn day04() {
 }
 
 fn day05() {
-    // 20117
+    // 389056265
     day05::solve_part_one(read_lines("src/inputs/day05.txt"));
     // 13768818
-    day05::solve_part_two(read_lines("src/inputs/day05.test.txt"));
+    day05::solve_part_two(read_lines("src/inputs/day05.txt"));
 }
 
 fn main() {
