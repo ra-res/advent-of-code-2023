@@ -1,7 +1,7 @@
 mod days;
 
 #[allow(dead_code)]
-mod main {
+mod run {
     use crate::days::{day01, day02, day03, day04, day05, day06};
     use std::fs::read_to_string;
     use std::path::Path;
@@ -54,17 +54,12 @@ mod main {
 
     pub fn day06() {
         // 389056265
-        day06::solve_part_one(read_lines("src/inputs/day06.test.txt"));
+        day06::solve_part_one(read_lines("src/inputs/day06.txt"));
         // 137516820
         day06::solve_part_two(read_lines("src/inputs/day06.test.txt"));
     }
 }
 
 fn main() {
-    // day01();
-    // day02();
-    // day03();
-    // day04();
-    // day05();
-    main::day06();
+    run::day06();
 }

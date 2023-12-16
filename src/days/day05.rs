@@ -17,15 +17,12 @@ impl Range {
     }
 
     fn get_seed(&self, seed: i64) -> i64 {
-        let d = seed - self.src;
-        let x = self.dest + d.abs();
-        return x;
+        return (seed - self.src).abs() + self.dest;
     }
 }
 
 impl fmt::Display for Range {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // Customize so only `x` and `y` are denoted.
         write!(
             f,
             "dest: {}, src: {}, range: {}",
@@ -115,7 +112,7 @@ fn build_map(cpy: Vec<String>) -> (Vec<String>, HashMap<String, Vec<Range>>) {
     return (keys, maps);
 }
 
-fn unbox_seeds(seeds: Vec<String>) -> Vec<Vec<i64>> {
+fn par_build_seed_batches(seeds: Vec<String>) -> Vec<Vec<i64>> {
     let par_iter = seeds.par_chunks_exact(2).map(|v| {
         let range_start = v.get(0).unwrap().parse::<i64>().unwrap();
         let range_end = range_start + v.get(1).unwrap().parse::<i64>().unwrap();
@@ -130,7 +127,7 @@ fn unbox_seeds(seeds: Vec<String>) -> Vec<Vec<i64>> {
 
 pub fn solve_part_two(lines: Vec<String>) {
     let mut cpy = lines.clone();
-    let batches: Vec<Vec<i64>> = unbox_seeds(get_seeds(cpy.clone()));
+    let batches: Vec<Vec<i64>> = par_build_seed_batches(get_seeds(cpy.clone()));
     cpy.remove(0); // remove seeds
     cpy.remove(0); // remove empty line after seeds
 
