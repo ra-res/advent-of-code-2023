@@ -68,7 +68,6 @@ pub fn solve_part_one(lines: Vec<String>) {
             .collect::<Vec<&GameState>>()
             .len();
 
-        println!("{winning_games_count}");
         if winning_games_count > 0 {
             result *= winning_games_count;
         }
