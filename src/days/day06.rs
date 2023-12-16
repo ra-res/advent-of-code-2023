@@ -77,5 +77,33 @@ pub fn solve_part_one(lines: Vec<String>) {
 }
 
 pub fn solve_part_two(lines: Vec<String>) {
-    println!("day6_2 {}", 1);
+    let time: i64 = lines[0]
+        .strip_prefix("Time:")
+        .unwrap()
+        .trim()
+        .replace(" ", "")
+        .parse::<i64>()
+        .unwrap();
+
+    let distance: i64 = lines[1]
+        .strip_prefix("Distance:")
+        .unwrap()
+        .trim()
+        .replace(" ", "")
+        .parse::<i64>()
+        .unwrap();
+
+    let mut result = 1;
+    let game = Game::new(time, distance);
+    let winning_games_count = game
+        .get_possible_states()
+        .iter()
+        .filter(|state| state.is_winning())
+        .collect::<Vec<&GameState>>()
+        .len();
+
+    if winning_games_count > 0 {
+        result *= winning_games_count;
+    }
+    println!("day6_2 {}", result);
 }

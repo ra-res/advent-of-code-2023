@@ -56,7 +56,7 @@ mod run {
         // 389056265
         day06::solve_part_one(read_lines("src/inputs/day06.txt"));
         // 137516820
-        day06::solve_part_two(read_lines("src/inputs/day06.test.txt"));
+        day06::solve_part_two(read_lines("src/inputs/day06.txt"));
     }
 }
 
