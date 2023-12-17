@@ -1,148 +1,127 @@
-use std::{cmp::Ordering, collections::HashMap};
+// https://github.com/ChristopherBiscardi/advent-of-code/blob/2a69fdb905c8d510c55d7f1e5f834f9e6a281292/2023/rust/day-07/src/part1.rs
 
-fn get_char_rank(c: char) -> i64 {
-    let mut map: HashMap<char, i64> = HashMap::new();
-    map.insert('A', 1);
-    map.insert('K', 2);
-    map.insert('Q', 3);
-    map.insert('J', 4);
-    map.insert('T', 5);
+use itertools::{Itertools, Position};
+use std::ops::Deref;
 
-    return map[&c];
-}
-
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
-struct Bid {
-    cards: Vec<char>,
-    bid_value: String,
-    rank: i64,
-}
-
-impl Bid {
-    /// Creates a new [`Bid`].
-    fn new(cards: Vec<char>, bid_value: String) -> Bid {
-        let rank = Bid::get_rank(cards.clone());
-        return Self {
-            cards,
-            bid_value,
-            rank,
-        };
-    }
-
-    fn get_cards_as_string(&self) -> String {
-        return self
-            .cards
-            .iter()
-            .map(|s| s.to_string())
-            .collect::<Vec<String>>()
-            .join("");
-    }
-
-    fn get_rank(cards: Vec<char>) -> i64 {
-        let mut frequency: HashMap<char, u32> = HashMap::new();
-        for word in cards.clone() {
-            *frequency.entry(word).or_insert(0) += 1;
-        }
-
-        let five_of_a_kind: Vec<u32> = vec![5];
-        let four_of_a_kind: Vec<u32> = vec![4, 1];
-        let full_house: Vec<u32> = vec![3, 2];
-        let three_of_a_kind: Vec<u32> = vec![3, 1, 1];
-        let two_pair: Vec<u32> = vec![2, 2, 1];
-        let one_pair: Vec<u32> = vec![2, 1, 1, 1];
-        let high_card: Vec<u32> = vec![1, 1, 1, 1, 1];
-
-        let mut vals: Vec<u32> = frequency
-            .clone()
-            .values()
-            .into_iter()
-            .map(|s| s.clone())
-            .collect::<Vec<u32>>();
-
-        vals.sort_by(|a, b| b.cmp(a));
-
-        if vals == five_of_a_kind {
-            return 1;
-        }
-
-        if vals == four_of_a_kind {
-            return 2;
-        }
-
-        if vals == full_house {
-            return 3;
-        }
-
-        if vals == three_of_a_kind {
-            return 4;
-        }
-
-        if vals == two_pair {
-            return 5;
-        }
-
-        if vals == one_pair {
-            return 6;
-        }
-
-        if vals == high_card {
-            return 7;
-        }
-
-        return 8;
-    }
+#[derive(Debug, Clone, Copy)]
+enum Type {
+    FiveOfAKind = 6,
+    FourOfAKind = 5,
+    FullHouse = 4,
+    ThreeOfAKind = 3,
+    TwoPair = 2,
+    OnePair = 1,
+    HighCard = 0,
 }
 
 pub fn solve_part_one(lines: Vec<String>) {
-    let mut bids: Vec<Bid> = lines
+    let hands = lines
         .iter()
         .map(|line| {
-            let str = line.split(" ").collect::<Vec<&str>>();
-            let cards = str[0].chars().collect::<Vec<char>>();
-            let bid_value = str[1].to_string();
-            return Bid::new(cards, bid_value);
+            let (hand, bid) = line.split_once(" ").unwrap();
+            return (hand, bid.parse::<u32>().unwrap(), score_hand(hand));
         })
-        .collect();
+        .sorted_by_key(|x| (x.2 .0 as u8, x.2 .1))
+        .enumerate()
+        .map(|(index, (_hand, bid, _))| (index as u32 + 1) * bid)
+        .sum::<u32>();
+    println!("day7_1 {}", hands.to_string());
+}
 
-    bids.sort_by(|a, b| {
-        let cmp = a.rank.cmp(&b.rank);
-        if cmp == Ordering::Equal {
-            for i in 0..a.cards.len() {
-                if a.cards[i] != b.cards[i] {
-                    if a.cards[i].is_digit(10) && b.cards[i].is_digit(10) {
-                        return b.cards[i].cmp(&a.cards[i]);
-                    };
+fn score_hand(hand: &str) -> (Type, (u32, u32, u32, u32, u32)) {
+    use Type::*;
 
-                    if a.cards[i].is_digit(10) {
-                        return Ordering::Less;
-                    }
+    let counts = hand.chars().counts();
+    let values = counts.values().sorted().join("");
+    let hand_type = match values.deref() {
+        "5" => FiveOfAKind,
+        "14" => FourOfAKind,
+        "23" => FullHouse,
+        "113" => ThreeOfAKind,
+        "122" => TwoPair,
+        "1112" => OnePair,
+        "11111" => HighCard,
+        value => panic!("should never happen. Encountered `{}`", value),
+    };
 
-                    if b.cards[i].is_digit(10) {
-                        return Ordering::Greater;
-                    }
+    let card_scores = hand
+        .chars()
+        .map(|card| match card {
+            'A' => 14,
+            'K' => 13,
+            'Q' => 12,
+            'J' => 11,
+            'T' => 10,
+            value => value.to_digit(10).unwrap(),
+        })
+        .collect_tuple()
+        .unwrap();
+    (hand_type, card_scores)
+}
 
-                    return get_char_rank(a.cards[i]).cmp(&get_char_rank(b.cards[i]));
-                }
-            }
+fn score_hand_with_jokers(hand: &str) -> (Type, (u32, u32, u32, u32, u32)) {
+    use Type::*;
+
+    let counts = hand.chars().counts();
+    let values = if let Some(joker_count) = counts.get(&'J') {
+        if *joker_count == 5 {
+            "5".to_string()
+        } else {
+            counts
+                .iter()
+                .filter_map(|(key, value)| (key != &'J').then_some(value))
+                .sorted()
+                .with_position()
+                .map(|(position, value)| match position {
+                    Position::Last | Position::Only => value + joker_count,
+                    _ => *value,
+                })
+                .join("")
         }
-        return cmp;
-    });
+    } else {
+        counts.values().sorted().join("")
+    };
 
-    let mut result: i64 = 0;
-    for i in 0..bids.len() {
-        let bid_val = bids[i].bid_value.parse::<i64>().unwrap();
-        println!(
-            "{} {bid_val} {} {}",
-            bids.len() - i,
-            bid_val * (bids.len() - i) as i64,
-            bids[i].get_cards_as_string()
-        );
-        result += bid_val * (bids.len() - i) as i64;
-    }
+    let hand_type = match values.deref() {
+        "5" => FiveOfAKind,
+        "14" => FourOfAKind,
+        "23" => FullHouse,
+        "113" => ThreeOfAKind,
+        "122" => TwoPair,
+        "1112" => OnePair,
+        "11111" => HighCard,
+        value => panic!("should never happen. Encountered `{}`", value),
+    };
 
-    println!("day7_1 {}", result)
+    let card_scores = hand
+        .chars()
+        .map(|card| match card {
+            'A' => 14,
+            'K' => 13,
+            'Q' => 12,
+            'J' => 1,
+            'T' => 10,
+            value => value.to_digit(10).unwrap(),
+        })
+        .collect_tuple()
+        .unwrap();
+    (hand_type, card_scores)
 }
 
 pub fn solve_part_two(lines: Vec<String>) {
-    println!("day7_2 {}", 1);
+    let hands = lines
+        .iter()
+        .map(|line| {
+            let (hand, bid) = line.split_once(" ").unwrap();
+            return (
+                hand,
+                bid.parse::<u32>().unwrap(),
+                score_hand_with_jokers(hand),
+            );
+        })
+        .sorted_by_key(|x| (x.2 .0 as u8, x.2 .1))
+        .enumerate()
+        .map(|(index, (_hand, bid, _))| (index as u32 + 1) * bid)
+        .sum::<u32>();
+    println!("day7_2 {}", hands.to_string());
 }

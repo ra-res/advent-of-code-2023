@@ -63,7 +63,7 @@ mod run {
         // 
         day07::solve_part_one(read_lines("src/inputs/day07.txt"));
         // 
-        day07::solve_part_two(read_lines("src/inputs/day07.test.txt"));
+        day07::solve_part_two(read_lines("src/inputs/day07.txt"));
     }
 }
 
