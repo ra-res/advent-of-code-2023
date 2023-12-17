@@ -61,12 +61,12 @@ mod run {
 
     pub fn day07() {
         // 
-        day07::solve_part_one(read_lines("src/inputs/day06.txt"));
+        day07::solve_part_one(read_lines("src/inputs/day07.txt"));
         // 
-        day07::solve_part_two(read_lines("src/inputs/day06.txt"));
+        day07::solve_part_two(read_lines("src/inputs/day07.test.txt"));
     }
 }
 
 fn main() {
-    run::day06();
+    run::day07();
 }
